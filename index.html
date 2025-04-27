@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>طلب منتج</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #fff8e1;
+      padding: 20px;
+    }
+    form, #thankYouMessage {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
+      margin-top: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #5d4037;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #6d4c41;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #fbebc8;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #fbe9e7;
+    }
+    button {
+      background-color: #8d6e63;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #6d4c41;
+    }
+    #orderDetails {
+      margin-top: 20px;
+      background-color: #fbe9e7;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: right;
+      color: #5d4037;
+      font-size: 18px;
+    }
+    #otherCityInput {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<form id="orderForm" action="https://formspree.io/f/xrbqbdkw" method="POST">
+  <h1>طلب منتج</h1>
+
+  <label for="product">اختر المنتج</label>
+  <select id="product" name="المنتج" required>
+    <option value="">-- اختر المنتج --</option>
+    <option value="Nickless" >Nickless </option>
+    <option value="Earrings ">Earrings </option>
+    <option value="Charms ">Charms </option>
+    <option value="Bracelet ">Bracelet </option>
+  </select>
+
+  <label for="email">البريد الإلكتروني</label>
+  <input type="email" id="email" name="البريد الإلكتروني" required>
+
+  <label for="country">الدولة</label>
+  <input type="text" id="country" name="الدولة" value="مصر" readonly required>
+
+  <label for="city">المحافظة</label>
+  <select id="city" name="المحافظة" required onchange="toggleOtherCity()">
+    <option value="">-- اختر المحافظة --</option>
+    <option value="القاهرة">القاهرة</option>
+    <option value="الجيزة">الجيزة</option>
+    <option value="الإسكندرية">الإسكندرية</option>
+    <option value="الدقهلية">الدقهلية</option>
+    <option value="الشرقية">الشرقية</option>
+    <option value="الغربية">الغربية</option>
+    <option value="المنوفية">المنوفية</option>
+    <option value="كفر الشيخ">كفر الشيخ</option>
+    <option value="دمياط">دمياط</option>
+    <option value="أسيوط">أسيوط</option>
+    <option value="سوهاج">سوهاج</option>
+    <option value="المنيا">المنيا</option>
+    <option value="قنا">قنا</option>
+    <option value="أسوان">أسوان</option>
+    <option value="الأقصر">الأقصر</option>
+    <option value="أخرى">أخرى</option>
+  </select>
+
+  <input type="text" id="otherCityInput" name="محافظة أخرى" placeholder="ادخل اسم المحافظة" />
+
+  <label for="street">الشارع</label>
+  <input type="text" id="street" name="الشارع" required>
+
+  <label for="building">رقم العمارة</label>
+  <input type="text" id="building" name="رقم العمارة" required>
+
+  <button type="submit">تأكيد الطلب</button>
+</form>
+
+<div id="thankYouMessage" style="display:none;">
+  <h2>شكرًا لك!</h2>
+  <p>تم إرسال طلبك بنجاح.</p>
+  <div id="orderDetails"></div>
+  <p style="margin-top: 20px; font-weight: bold;">سيتم التواصل معك من قبل الأدمن لتأكيد الطلب والدفع.</p>
+</div>
+
+<script>
+  const form = document.getElementById('orderForm');
+  const thankYou = document.getElementById('thankYouMessage');
+  const orderDetails = document.getElementById('orderDetails');
+  const citySelect = document.getElementById('city');
+  const otherCityInput = document.getElementById('otherCityInput');
+
+  function toggleOtherCity() {
+    if (citySelect.value === 'أخرى') {
+      otherCityInput.style.display = 'block';
+      otherCityInput.required = true;
+    } else {
+      otherCityInput.style.display = 'none';
+      otherCityInput.required = false;
+    }
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    fetch(form.action, {
+      method: form.method,
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    }).then(response => {
+      if (response.ok) {
+        form.style.display = 'none';
+        thankYou.style.display = 'block';
+        const selectedProduct = formData.get('المنتج');
+        orderDetails.innerHTML = `
+          <p><strong>المنتج:</strong> ${selectedProduct}</p>
+        `;
+      } else {
+        alert('حدث خطأ أثناء الإرسال. حاول مرة أخرى.');
+      }
+    }).catch(error => {
+      alert('حدث خطأ أثناء الإرسال. حاول مرة أخرى.');
+    });
+  });
+</script>
+
+</body>
+</html
